@@ -1,13 +1,15 @@
-* Transformation RGB -> mit matrix
+* Chapter 1
 
-RGB -> HSV doesn't work
-RGB -> XYZ, YIQ, YUC we can use matrix transformation
-RGB -> LAB needs a transformation to XYZ first before transformating to LAB
+** Transformation RGB -> mit matrix
 
-* What for?
+ RGB -> HSV doesn't work
+ RGB -> XYZ, YIQ, YUC we can use matrix transformation
+ RGB -> LAB needs a transformation to XYZ first before transformating to LAB
 
-HSV: use it to improve quality
-LAB: use it to get a color space which is true to perception
+** What for?
+
+ HSV: use it to improve quality
+ LAB: use it to get a color space which is true to perception
 
 * Chapter 2
 

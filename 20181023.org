@@ -1,4 +1,100 @@
+* Chapter 1
+
+** Transformation RGB -> mit matrix
+
+ RGB -> HSV doesn't work
+ RGB -> XYZ, YIQ, YUC we can use matrix transformation
+ RGB -> LAB needs a transformation to XYZ first before transformating to LAB
+
+** What for?
+
+ HSV: use it to improve quality
+ LAB: use it to get a color space which is true to perception
+
 * Chapter 2
+
+** Histogramme
+
+*** Definition & Properties
+
+X axis = value
+Y axis = sum
+
+Normiertes Histogramm:
+every x value shows the amount of pixels with that value
+
+Cumulative Histogramm:
+Every x value is the cumulative sum of all previous occurrences
+
+P(g) = occurrences divided by total pixels (normierte Histogramm)
+Median = for (value : table) p(value) * it_index 
+
+** Bildverbesserung
+
+*** GrauwertSpreizung
+
+first clamp the values to our new scale, for example the grey scale image only has values
+between 75 and 225 then we normalize them to a 0-150 range by subtracting 75 from them.
+With this range we normalize it on a 0-1 scale now we fill out the 0-1 scale fully and from
+this we can multiply by 255 to get a good 0-255 scale and this way we improved the contrast
+of the image.
+
+#+BEGIN_SRC matlab
+I = imread('pout.tif');
+figure, imshow(I); * show image
+
+I2 = imadjust(I); * adjust contrast
+figure, imhist(I2); * show histogramm
+
+# map values from the range on the left to the range on the right
+ X = imadjust(I, [low_in, high_in], [low_out, high_out])
+#+END_SRC
+
+ Spreizung Min=1% bis Max=99% bedeutet das die ersten 1% der Werte weggelassen wird und die
+ letzte 1% weggelassen wird.
+
+*** Gammakorrektur
+
+Werte unter 1 sorgen fuer eine Aufhellung, Werte ueber 1 eine Verdunkelung
+
+lambda < 1: Spreizung der dunkleren und Stauchung der helleren Werte.
+lambda > 1: Umgekehrt
+
+
+#+BEGIN_SRC matlab
+# do gamma correcting in matlab
+ J = imadjust(I, [low_in, high_in], [low_out, high_out], gamme);
+#+END_SRC
+
+ Benutzen wenn es eine Ueberrepresentation Werter in dem dunklen oder hellen Bereich.
+
+*** Histogrammlinearisierung
+
+Entropiemaximierung: Fachbegriff Histogrammeaequivilation
+
+
+Nehme das Kumulatieve Histogramm und aendere die y scala zu 0-255. Dan nehmen wir den Wert auf der 
+y achse als unseren neuen Grauwert fuer den Wert auf x.
+
+
+*** Stretching bei Farbbild
+
+Wir nehmen den HSV Farbbereich damit wir die Helligkeit trennen koennen von den Farben,
+sonst wurde bei der Spreizung sich die Farbe aendern.
+
+Mann kann Saturation oder Value stretchen. Meistens wird Saturation aber nicht gestretched.
+
+
+** Pixelbasierte Operationen
+
+*** Schwellwertbasiertes Binning
+
+Von vielen zu weniger Farben transformieren: bsp. 12bit -> 8bit
+
+*** Otsu
+
+Benutzt beim Binning.
+
   
 ** Summary
 
@@ -117,5 +213,130 @@ links 9 Multiplikationen vs rechts 3 und 3
 Pixel in der Mitte am staerksten betont.
 
 ** Kantenfilter (Differenzfilter)
+   
+*** Kantenfilter
+    
+\[\frac{delta f}{delta x}
+= \frac{f(x, y) - f(x - 1, y)}{1}
+\]
+
+Wie sieht die Filtermatrix bzw Filter aus?
+
+\[1 * f(x, y) + (-1) * f(x-1, y)
+= (-1) * (f(x-1, y) + 1 * f(x, y) + 0 * f(x + 1, y)
+
+h_{180} =
+\begin{bmatrix}
+-1 & 1 & 0
+\end{bmatrix}
+
+h =
+\begin{bmatrix}
+0 & 1 & -1
+\end{bmatrix}
+\]
+
+Vorwaertsgradient
+
+\[\frac{delta f}{delta x}
+= f(x + 1, y) - f(x, y)
+= 0 * f(x - 1, y) + (-1) * f(x, y) + 1 * f(x + 1, y)
+=> f * h
+h_{180} =
+\begin{bmatrix}
+0 & -1 & 1)
+\end{bmatrix}
+
+h = h_{0} =
+\begin{bmatrix}
+1 & -1 & 0
+\end{bmatrix}
+
+\]
+
+f * h             h?
+**** Differenzen in x-richtung
+     
+vertikale Kante.
+
+**** Differenzen in y-richtung
+     
+horizontale Kante.
+
+**** Laplacefilter
+     
+Andere Beispiels Laplacefilter
+
+\begin{bmatrix}
+0 & 1 & 0 \\
+1 & -1 & 1 \\
+0 & 1 & 0
+\end{bmatrix}
+
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & -8 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+
+**** Sobeloperatoren
+     
+Extrahieren Kanten mit Vorzugsrichtungen und gleichzeitiger Glaettung.
+
+**** Marr Hildreth Kantendetekrot
+     
+\begin{bmatrix}
+1 & 0.5 & 0.2 \\
+0.1 & 0.1 & 0.2 \\
+0.4 & -0.1 & -0.2
+\end{bmatrix}
+
+***** Zero crossing
+
+Eine Linie wobei das signum von Negative auf Positiv oder andersrum geht.
+
+Folie 35 Antwort zu zero crossing.
+
+Einer reicht um zero crossing zu haben
+
+**** Canny Edge Detector
+     
+Horizontale Kanten <= h_{y} =
+\begin{bmatrix}
+1 & 2 & 1 \\
+0 & 0 & 0 \\
+-1 & -2 & -1
+\end{bmatrix}
+
+Vertikale Kante h_{x} =
+\begin{bmatrix}
+1 & 0 & -1 \\
+2 & 0 & -2 \\
+1 & 0 & -1
+\end{bmatrix}
+
+Laenge des  Vektors:
+sqrt(G_{x}^{2} + G_{y}^{2})
+
+Winkel des Vektors
+
+arctan(G_{y} / G_{x})
+
+Keine relevanten Kantenpixel
+\begin{bmatrix}
+0 & \dots & T_{1}
+\end{bmatrix}
+
+Schwache Kantenpixel
+\begin{bmatrix}
+>T_{1} & \dots & T_{2}
+\end{bmatrix}
+
+Starke Kantenpixel
+\begin{bmatrix}
+>T_{2} & \dots & 1024
+\end{bmatrix}
+
+
 
 ** Nicht lineare Filter

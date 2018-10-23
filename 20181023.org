@@ -1,0 +1,121 @@
+* Chapter 2
+  
+** Summary
+
+Pixelbasierte Operationen:
+Ein Algorithmus der nur auf Basis der Pixelinformation arbeitet.
+
+(w_{max} - w_{min}_) * ((g - g_{min}) / (g_{max} - g_{min}))
+
+\frac{g - g_{min}}{g_{max} - g_{min}}
+
+Bild f, Pixelposition sei (x,y)
+
+=f(x, y) -> f'(x, y)=
+zum Beispiel Kontrastanpassungen auf Basis des Histogramms und Gammakorrektur.
+
+* Chapter 3  
+  
+** Was ist ein Filter
+   
+=ROI= Region of interest.
+
+Beispiel 3x3 ROI.
+
++--+--+--+
+|  |  |  |
++--+--+--+
+|  |  |  |
++--+--+--+
+|  |  |  |
++--+--+--+
+
+Die ROI wird Pixel pro Pixel weiter bewogen und fuer jeden Pixel wird also die Operation ausgefuehrt.
+
+f =
+
++--+---+----+
+|10|20 |100 |
++--+---+----+
+|50|100|100 |
++--+---+----+
+|10|80 |120 |
++--+---+----+
+
+#+BEGIN_SRC python
+f = [[10, 20, 100], [50, 100, 100], [10, 80, 120]]
+#+END_SRC
+
+h =
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & 1 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+
+#+BEGIN_SRC python
+h = [[1, 1, 1], [1, 1, 1], [1, 1, 1]]
+#+END_SRC
+
+#+BEGIN_SRC python
+
+res = []
+
+for u in range(-1, 1):
+    for v in range(-1, 1):
+        res[u][v] = f[2-u][2-v] * h[u][v]
+#+END_SRC
+
+Das ist eine Convolution.
+
+*** Faltung
+
+f_{1}, f_{2} sei =100x100= Pixel, h sei =5x5= => pro Pixel 25 Multiplikationen & 24 Additionen.
+
+a_{1} * f_{1} => 100^{2} Multiplikationen
+a_{2} * f_{2} => 100^{2} Multiplikationen
+
+h * f_{1} => 100^{2} * 25
+h * f_{2} => 100^{2} * 25
+
+a_{1} * (h * f_{1}) => 100^{2} + 100^{2} * 25
+a_{2} * (h * f_{2}) => 100^{2} + 100^{2} * 25
+
+a_{1} * (h * f_{1}) + a_{2} * (h * f_{2})
+= 2 * 100^{2} + 2 * 100^{2} * 25
+= 2 * 100^{2} * (1 + 25)
+= 52 * 100^{2} Multiplikationen
+
+h * (a_{1} * f_{1} + a_{2} * f_{2}) = 2 * 100^{2} + 25 * 100^{2} = 100^{2} * 27 Multiplikationen
+
+
+Beispiel effizienz Steigerung
+
+1/9 *
+\begin{bmatrix}
+1 & 1 & 1 \\
+1 & 1 & 1 \\
+1 & 1 & 1
+\end{bmatrix}
+=
+1/3 *
+\begin{bmatrix}
+1 \\
+1 \\
+1
+\end{bmatrix} * 1/3 *
+\begin{bmatrix}
+1 & 1 & 1
+\end{bmatrix}
+
+links 9 Multiplikationen vs rechts 3 und 3
+
+** Glaettungsfilter (Summenfilter)
+
+*** Gaussfilter
+    
+Pixel in der Mitte am staerksten betont.
+
+** Kantenfilter (Differenzfilter)
+
+** Nicht lineare Filter

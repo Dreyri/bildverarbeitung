@@ -1,19 +1,19 @@
-# Transformation RGB -> mit matrix
+* Transformation RGB -> mit matrix
 
 RGB -> HSV doesn't work
 RGB -> XYZ, YIQ, YUC we can use matrix transformation
 RGB -> LAB needs a transformation to XYZ first before transformating to LAB
 
-# What for?
+* What for?
 
 HSV: use it to improve quality
 LAB: use it to get a color space which is true to perception
 
-# Chapter 2
+* Chapter 2
 
-## Histogramme
+** Histogramme
 
-### Definition & Properties
+*** Definition & Properties
 
 X axis = value
 Y axis = sum
@@ -27,9 +27,9 @@ Every x value is the cumulative sum of all previous occurrences
 P(g) = occurrences divided by total pixels (normierte Histogramm)
 Median = for (value : table) p(value) * it_index 
 
-## Bildverbesserung
+** Bildverbesserung
 
-### GrauwertSpreizung
+*** GrauwertSpreizung
 
 first clamp the values to our new scale, for example the grey scale image only has values
 between 75 and 225 then we normalize them to a 0-150 range by subtracting 75 from them.
@@ -37,52 +37,59 @@ With this range we normalize it on a 0-1 scale now we fill out the 0-1 scale ful
 this we can multiply by 255 to get a good 0-255 scale and this way we improved the contrast
 of the image.
 
-```matlab
+#+BEGIN_SRC matlab
 I = imread('pout.tif');
-figure, imshow(I); # show image
+figure, imshow(I); * show image
 
-I2 = imadjust(I); # adjust contrast
-figure, imhist(I2); # show histogramm
+I2 = imadjust(I); * adjust contrast
+figure, imhist(I2); * show histogramm
 
 # map values from the range on the left to the range on the right
-X = imadjust(I, [low_in, high_in], [low_out, high_out])
-```
+ X = imadjust(I, [low_in, high_in], [low_out, high_out])
+#+END_SRC
 
-Spreizung Min=1% bis Max=99% bedeutet das die ersten 1% der Werte weggelassen wird und die
-letzte 1% weggelassen wird.
+ Spreizung Min=1% bis Max=99% bedeutet das die ersten 1% der Werte weggelassen wird und die
+ letzte 1% weggelassen wird.
 
-### Gammakorrektur
+*** Gammakorrektur
 
 Werte unter 1 sorgen fuer eine Aufhellung, Werte ueber 1 eine Verdunkelung
 
 lambda < 1: Spreizung der dunkleren und Stauchung der helleren Werte.
 lambda > 1: Umgekehrt
 
-```matlab
+
+#+BEGIN_SRC matlab
 # do gamma correcting in matlab
-J = imadjust(I, [low_in, high_in], [low_out, high_out], gamme);
-```
+ J = imadjust(I, [low_in, high_in], [low_out, high_out], gamme);
+#+END_SRC
 
-Benutzen wenn es eine Ueberrepresentation Werter in dem dunklen oder hellen Bereich.
+ Benutzen wenn es eine Ueberrepresentation Werter in dem dunklen oder hellen Bereich.
 
-### Histogrammlinearisierung
+*** Histogrammlinearisierung
+
+Entropiemaximierung: Fachbegriff Histogrammeaequivilation
+
 
 Nehme das Kumulatieve Histogramm und aendere die y scala zu 0-255. Dan nehmen wir den Wert auf der 
 y achse als unseren neuen Grauwert fuer den Wert auf x.
 
 
-### Stretching bei Farbbild
+*** Stretching bei Farbbild
 
 Wir nehmen den HSV Farbbereich damit wir die Helligkeit trennen koennen von den Farben,
 sonst wurde bei der Spreizung sich die Farbe aendern.
 
+Mann kann Saturation oder Value stretchen. Meistens wird Saturation aber nicht gestretched.
 
-## Pixelbasierte Operationen
 
-### Binning
+** Pixelbasierte Operationen
+
+*** Schwellwertbasiertes Binning
 
 Von vielen zu weniger Farben transformieren: bsp. 12bit -> 8bit
 
-### Otsu
+*** Otsu
 
+Benutzt beim Binning.
 

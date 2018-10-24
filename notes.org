@@ -340,3 +340,19 @@ Starke Kantenpixel
 
 
 ** Nicht lineare Filter
+
+
+   
+** Summary
+
+- Glaettungsfilter
+  - Mittelwerstfilter
+  - Binomial- bzw. Gaussfilter
+- Kantenfilter
+  - Faltungsoperatoren
+  - Marr Hildreth Operator
+  - Canny Edge Operator
+- Nicht lineare Filter
+  - Median
+  - Minimum
+  - Maximum
